@@ -1,12 +1,13 @@
 (() => {
     const { ApiError, CONSTANTS, HELPERS } = window;
     const { WIDTH, HEIGHT, SIZE, COLORS, DROP_THROTTLE, EMPTY } = CONSTANTS;
-    const { genMatrix, flatForEach, genRandomColor, rotate2DArray } = HELPERS;
+    const { genMatrix, flatForEach, genRandomColor, rotate2DArray, notMaxThen } = HELPERS;
 
     window.Controller = class {
         _listeners = {};
 
         _score = 0;
+        _stopped = false;
 
         pos = { x: 0, y: 0 };
         piece = [
@@ -18,7 +19,7 @@
         _droppedTimer = undefined;
 
         /** Конструктор и его состовляющие */
-        constructor(canvasSelector, withListener) {
+        constructor(canvasSelector, withListener, stoppedByDefault) {
             this.canvas = document.querySelector(canvasSelector);
             if (!this.canvas) throw new ApiError('canvas is not defined');
 
@@ -28,27 +29,30 @@
             this.canvas.width = WIDTH * SIZE;
             this.canvas.height = HEIGHT * SIZE;
 
-            this.matrix = genMatrix(WIDTH, HEIGHT);
-
-            if (window.DEBUG) {
-                this.matrix[3][5] = 2;
-                this.matrix[3][3] = 1;
-                this.matrix[4][4] = 2;
-                this.matrix[6][2] = 3;
-                this.matrix[6][6] = 4;
-            }
-
             if (withListener) this._setListeners();
 
-            this._createNewPiece();
+            this._stopped = stoppedByDefault;
+
+            this._newGame();
             this._loop();
         }
+
+        _newGame = () => {
+            this._score = 0;
+            this.matrix = genMatrix(WIDTH, HEIGHT);
+            this._createNewPiece();
+        };
 
         _createNewPiece = () => {
             const { floor } = Math;
 
+            const centerX = floor(WIDTH / 2) - 1;
+
+            if (this.matrix[0][centerX + 1] !== EMPTY)
+                this._gameOver();
+
             this.pos = {
-                x: floor(WIDTH / 2) - 1,
+                x: centerX,
                 y: -2
             };
 
@@ -64,6 +68,10 @@
                 console.log(e.key, e.keyCode);
 
                 switch (e.keyCode) {
+                    // SPACE
+                    case 32:
+                        this._save();
+                        break;
                     // UP
                     case 38:
                     case 87: {
@@ -116,10 +124,21 @@
         /** Публичное API */
         on = (toListen, callback) => {
             this._listeners[toListen] = callback;
+            return this;
+        };
+
+        stop = () => {
+            this._stopped = true;
+        };
+
+        start = () => {
+            this._stopped = false;
         };
 
         /** Методы передвижений */
         _drop = (hardDrop) => {
+            const { floor } = Math;
+
             const callback = () => {
                 clearTimeout(this._droppedTimer);
                 this._droppedTimer = undefined;
@@ -132,7 +151,7 @@
                 callback();
             } else {
                 if (!this._droppedTimer) {
-                    this._droppedTimer = setTimeout(callback, DROP_THROTTLE);
+                    this._droppedTimer = setTimeout(callback, DROP_THROTTLE - notMaxThen(floor(this._score / 10) * 100, DROP_THROTTLE / 1.25));
                 }
             }
         };
@@ -270,7 +289,18 @@
             } while (changed);
         };
 
+        _gameOver = () => {
+            console.log('%cGame Over', 'background: #333333; border: 1px solid #ffffff; color: #ffffff; padding: 5px;')
+
+            if (this._listeners.gameOver) this._listeners.gameOver();
+            this._newGame();
+        };
+
         _save = () => {
+            const { x, y } = this.pos;
+            if (this.piece.some((row, pY) => row.some((_, pX) => x + pX < 0 || y + pY < 0)))
+                this._gameOver();
+
             this.matrix = this._matrixWithGravityDrop(this._matrixWithPiece());
 
             this._checkBeatles();
@@ -281,6 +311,10 @@
         };
 
         _loop = () => {
+            if (this._stopped)
+                return;
+            console.log('looped');
+
             this._drop();
             this._draw();
 

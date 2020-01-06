@@ -8,7 +8,7 @@
 
     const rand = (min, max) => floor(random() * (max - min)) + min;
 
-    const genRandomColor = () => rand(1, COLORS.length - 1);
+    const genRandomColor = () => rand(1, COLORS.length);
 
     const rotate2DArray = arr => {
         const { length: height } = arr;
@@ -31,5 +31,7 @@
 
     const logTable = matrix => console.table(matrix.map(row => row.map(fill => COLORS[fill])));
 
-    window.HELPERS = { genArray, genMatrix, rand, logTable, rotate2DArray, flatForEach, genRandomColor };
+    const notMaxThen = (cur, max) => cur > max ? max : cur;
+
+    window.HELPERS = { genArray, genMatrix, rand, logTable, rotate2DArray, flatForEach, genRandomColor, notMaxThen };
 })();
