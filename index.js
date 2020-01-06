@@ -10,6 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Контроллы
     const pause = player.querySelector('.pause');
+    const reload = player.querySelector('.reload');
     // Контролл-обложка
     const play = player.querySelector('.play');
 
@@ -30,6 +31,10 @@ window.addEventListener('DOMContentLoaded', () => {
         playerController
             .on('score', scoreCallback)
             .on('gameOver', scoreCallback);
+    });
+
+    reload.addEventListener('click', () => {
+        playerController.newGame();
     });
 
     // Кнопка паузы

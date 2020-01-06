@@ -68,6 +68,9 @@
                 switch (e.keyCode) {
                     // SPACE
                     case 32:
+                        // Гарантия того, что мы упадем не за пределами view
+                        this._drop(true);
+                        this._drop(true);
                         this._save();
                         break;
                     // UP
@@ -132,6 +135,10 @@
         start = () => {
             this._stopped = false;
             this._loop();
+        };
+
+        newGame = () => {
+            this._newGame();
         };
 
         /** Методы передвижений */

@@ -3,6 +3,10 @@ body {
     font-family: "YS Text", "Arial Black";
 }
 
+.row {
+    display: flex;
+}
+
 .game {
     font-family: "YS Text", "Arial Black";
 
@@ -92,6 +96,15 @@ body {
 
 .play {
     background: #333333;
+}
+
+.reload {
+    margin-right: 10px;
+}
+
+.reload::before {
+    display: block;
+    content: '⟲';
 }
 
 .play:hover,
