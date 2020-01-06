@@ -331,7 +331,7 @@
 
         _save = () => {
             const { x, y } = this._pos;
-            if (this._piece.some((row, pY) => row.some((_, pX) => x + pX < 0 || y + pY < 0)))
+            if (this._piece.some((row, pY) => row.some((fill, pX) => fill !== EMPTY && x + pX < 0 || y + pY < 0)))
                 this._gameOver();
 
             this.matrix = this._matrixWithGravityDrop(this._matrixWithPiece());
@@ -346,7 +346,6 @@
         _loop = () => {
             if (this._stopped)
                 return;
-            console.log('looped');
 
             this._drop();
             this._draw();
