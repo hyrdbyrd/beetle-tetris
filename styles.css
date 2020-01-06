@@ -12,6 +12,8 @@ body {
     align-items: center;
     justify-content: space-around;
 
+    box-sizing: border-box;
+
     min-height: 100vh;
 
     background-color: #111133;
