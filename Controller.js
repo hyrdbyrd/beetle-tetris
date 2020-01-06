@@ -32,7 +32,7 @@
             this._stopped = stoppedByDefault;
 
             this._newGame();
-            this._loop();
+            this.start();
         }
 
         _newGame = () => {
@@ -131,6 +131,7 @@
 
         start = () => {
             this._stopped = false;
+            this._loop();
         };
 
         /** Методы передвижений */

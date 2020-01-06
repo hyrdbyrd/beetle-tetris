@@ -1,35 +1,47 @@
 const { Player, AI } = window;
 
 (() => {
-    // Player
-    const player = document.querySelector('.player');
-    if (player) {
+    try {
+        // Player
+        const player = document.querySelector('.player');
+
         const scoreElement = player.querySelector('.score');
-        if (scoreElement)
-            scoreElement.innerText = 'Score: 0';
+        scoreElement.innerText = 'Score: 0';
 
         const play = player.querySelector('.play');
+        const pause = player.querySelector('.pause');
+
+        const paused = player.querySelector('.paused');
 
         let playerController;
 
         // Для получения размера контейнера
         playerController = new Player('#player', true);
 
-        if (play)
-            play.addEventListener('click', () => {
-                playerController = new Player('#player');
+        play.addEventListener('click', () => {
+            play.classList.add('hidden');
 
-                play.classList.add('hidden');
+            playerController.start();
+            playerController
+                .on('score', score => {
+                    console.log('\n\n\n\n1\n\n\n', score);
+                    if (score) scoreElement.innerText = `Score: ${score}`;
+                });
+        });
 
-                playerController.start();
-                playerController
-                    .on('score', score => {
-                        console.log('\n\n\n\n1\n\n\n', score);
-                        if (score) scoreElement.innerText = `Score: ${score}`;
-                    });
-            });
+        pause.addEventListener('click', () => {
+            playerController.stop();
+            paused.classList.remove('hidden');
+        });
+
+        paused.addEventListener('click', () => {
+            playerController.start();
+            paused.classList.add('hidden');
+        });
+
+        // AI
+        // new AI('#ai');
+    } catch (e) {
+        console.error(e);
     }
-
-    // AI
-    // new AI('#ai');
 })();

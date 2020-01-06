@@ -35,14 +35,41 @@ body {
     flex-direction: column;
 }
 
-.play {
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+
+    background: #333333;
+    color: #ffffff;
+
+    font-size: 16px;
+}
+
+.pause {
+    font-size: 18px;
+
+    word-spacing: 2px;
+
+    font-weight: bolder;
+}
+
+.pause::before {
+    display: block;
+    content: '⏸️';
+}
+
+.paused, .play {
+    z-index: 2;
     position: absolute;
 
     width: 100%;
     height: 100%;
-
-    background: #fc0;
-    color: #333333;
 
     padding: 10px;
 
@@ -56,22 +83,28 @@ body {
     transition: all .2s ease-in-out;
 }
 
-.play:hover {
+.paused::before, .play::before {
+    display: block;
+    content: '▶️'
+}
+
+.play {
+    background: #fc0;
+    color: #333333;
+}
+
+.play:hover, .paused {
     font-size: 48px;
     box-shadow: inset 0 0 25px 25px rgba(255, 255, 255, .2);
 }
 
-.play.hidden {
+.hidden {
     display: none;
 }
 
-.score {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 10px;
-
-    background: #333333;
+.paused {
+    background: rgba(69, 69, 69, .5);
     color: #ffffff;
 
-    font-size: 16px;
+    box-shadow: inset 0 0 40px 40px rgba(0, 0, 0, .5);
 }
