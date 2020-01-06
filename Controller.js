@@ -148,7 +148,7 @@
 
             if (hardDrop) callback();
             else if (!this._droppedTimer)
-                this._droppedTimer = setTimeout(callback, DROP_THROTTLE - notMaxThen(floor(this._score / 10) * 100, DROP_THROTTLE / 1.25));
+                this._droppedTimer = setTimeout(callback, DROP_THROTTLE - notMaxThen(floor(this._score / 50) * 100, DROP_THROTTLE / 1.25));
         };
 
         _rotate = () => {
@@ -278,6 +278,8 @@
         _checkBeatles = () => {
             const { _createBeetleName: newName, _getCoordsByBeetleName: getCoords } = this;
 
+            let total = 0;
+
             let changed;
             do {
                 this.matrix = this._matrixWithGravityDrop();
@@ -312,7 +314,7 @@
 
                                 this.matrix[y][x] = EMPTY;
 
-                                this._addScore(checked.size);
+                                total += checked.size;
                             });
 
                             changed = true;
@@ -320,6 +322,8 @@
                     }
                 });
             } while (changed);
+
+            this._addScore(total);
         };
 
         _gameOver = () => {
