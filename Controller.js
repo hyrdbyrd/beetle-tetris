@@ -157,7 +157,7 @@
 
             if (hardDrop) callback();
             else if (!this._droppedTimer)
-                this._droppedTimer = setTimeout(callback, DROP_THROTTLE - notMaxThen(floor(this._score / 50) * 100, DROP_THROTTLE / 1.25));
+                this._droppedTimer = setTimeout(callback, DROP_THROTTLE - notMaxThen(floor(this._score / 50) * 100, DROP_THROTTLE / 1.15));
         };
 
         _rotate = () => {
