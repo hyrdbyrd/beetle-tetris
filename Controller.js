@@ -145,13 +145,9 @@
                 if (this._listeners.drop) this._listeners.drop();
             };
 
-            if (hardDrop) {
-                callback();
-            } else {
-                if (!this._droppedTimer) {
-                    this._droppedTimer = setTimeout(callback, DROP_THROTTLE - notMaxThen(floor(this._score / 10) * 100, DROP_THROTTLE / 1.25));
-                }
-            }
+            if (hardDrop) callback();
+            else if (!this._droppedTimer)
+                this._droppedTimer = setTimeout(callback, DROP_THROTTLE - notMaxThen(floor(this._score / 10) * 100, DROP_THROTTLE / 1.25));
         };
 
         _rotate = () => {

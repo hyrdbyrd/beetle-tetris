@@ -26,11 +26,6 @@ const { Player, AI } = window;
                     .on('score', score => {
                         console.log('\n\n\n\n1\n\n\n', score);
                         if (score) scoreElement.innerText = `Score: ${score}`;
-                    })
-                    .on('gameOver', score => {
-                        play.classList.remove('hidden');
-                        playerController.stop();
-
                     });
             });
     }
