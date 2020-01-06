@@ -4,19 +4,17 @@
     const { genMatrix, flatForEach, genRandomColor, rotate2DArray, notMaxThen } = HELPERS;
 
     window.Controller = class {
-        _listeners = {};
-
         _score = 0;
+        _listeners = {};
         _stopped = false;
-
-        pos = { x: 0, y: 0 };
-        piece = [
+        _pos = { x: 0, y: 0 };
+        _droppedTimer = undefined;
+        _piece = [
             [0, 0, 0],
             [0, 0, 0],
             [0, 0, 0]
         ];
 
-        _droppedTimer = undefined;
 
         /** Конструктор и его состовляющие */
         constructor(canvasSelector, withListener, stoppedByDefault) {
@@ -51,12 +49,12 @@
             if (this.matrix[0][centerX + 1] !== EMPTY)
                 this._gameOver();
 
-            this.pos = {
+            this._pos = {
                 x: centerX,
                 y: -2
             };
 
-            this.piece = [
+            this._piece = [
                 [0, genRandomColor(), 0],
                 [0, genRandomColor(), 0],
                 [0, 0,                0]
@@ -100,8 +98,8 @@
             });
         }
 
-        _move = (onMove, catchMove = () => undefined, xFunc = x => x, yFunc = y => y, piece = this.piece, matrix = this.matrix) => {
-            const { x, y } = this.pos;
+        _move = (onMove, catchMove = () => undefined, xFunc = x => x, yFunc = y => y, piece = this._piece, matrix = this.matrix) => {
+            const { x, y } = this._pos;
 
             const canSet = !piece.some((row, pY) =>
                 row.some((fill, pX) => {
@@ -143,7 +141,7 @@
                 clearTimeout(this._droppedTimer);
                 this._droppedTimer = undefined;
 
-                this._move(() => this.pos.y++, this._save, undefined, y => y + 1);
+                this._move(() => this._pos.y++, this._save, undefined, y => y + 1);
                 if (this._listeners.drop) this._listeners.drop();
             };
 
@@ -158,8 +156,8 @@
 
         _rotate = () => {
             const { matrix } = this;
-            const { x, y } = this.pos;
-            const piece = rotate2DArray(this.piece);
+            const { x, y } = this._pos;
+            const piece = rotate2DArray(this._piece);
 
             const canSet = piece.every((row, pY) =>
                 row.every((fill, pX) => {
@@ -172,12 +170,12 @@
                 })
             );
 
-            if (canSet) this.piece = piece;
+            if (canSet) this._piece = piece;
         };
 
-        _left = this._move.bind(this, () => this.pos.x--, undefined, x => --x);
+        _left = this._move.bind(this, () => this._pos.x--, undefined, x => --x);
 
-        _right = this._move.bind(this, () => this.pos.x++, undefined, x => ++x);
+        _right = this._move.bind(this, () => this._pos.x++, undefined, x => ++x);
 
         /** Хелперы */
         _fillPixel = (fill, x, y) => {
@@ -188,15 +186,15 @@
         };
 
         _draw = () => {
-            const { matrix, _fillPixel, piece, pos: { x, y } } = this;
+            const { matrix, _fillPixel, _piece, _pos: { x, y } } = this;
 
             this.ctx.clearRect(0, 0, WIDTH * SIZE, HEIGHT * SIZE);
 
             flatForEach(matrix, _fillPixel);
-            flatForEach(piece, (fill, pX, pY) => _fillPixel(fill, pX + x, pY + y));
+            flatForEach(_piece, (fill, pX, pY) => _fillPixel(fill, pX + x, pY + y));
         };
 
-        _matrixWithPiece = (matrix = this.matrix, piece = this.piece, pos = this.pos) => {
+        _matrixWithPiece = (matrix = this.matrix, piece = this._piece, pos = this._pos) => {
             const { x, y } = pos;
             const newMatrix = matrix.map(e => [...e]);
 
@@ -297,8 +295,8 @@
         };
 
         _save = () => {
-            const { x, y } = this.pos;
-            if (this.piece.some((row, pY) => row.some((_, pX) => x + pX < 0 || y + pY < 0)))
+            const { x, y } = this._pos;
+            if (this._piece.some((row, pY) => row.some((_, pX) => x + pX < 0 || y + pY < 0)))
                 this._gameOver();
 
             this.matrix = this._matrixWithGravityDrop(this._matrixWithPiece());
