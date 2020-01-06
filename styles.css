@@ -20,6 +20,8 @@ body {
 }
 
 .desk {
+    overflow: hidden;
+
     position: relative;
 
     border: 2px solid #333333;
