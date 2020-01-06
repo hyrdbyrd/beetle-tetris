@@ -108,7 +108,7 @@ body {
 }
 
 .play:hover,
-.paused {
+.paused:hover {
     font-size: 48px;
     box-shadow: inset 0 0 25px 25px rgba(255, 255, 255, .2);
 }
