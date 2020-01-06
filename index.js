@@ -18,7 +18,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const paused = player.querySelector('.paused');
 
     // Для получения размера контейнера
-    const playerController = new Player('#player', true);
+    /** type {HTMLImageElement} */
+    const playerController = new Player('#player', true, document.querySelector('#game-bg'));
 
     const scoreCallback = score => scoreElement.innerText = `Score: ${score}`;
 

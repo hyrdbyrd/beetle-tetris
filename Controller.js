@@ -17,12 +17,14 @@
 
 
         /** Конструктор и его состовляющие */
-        constructor(canvasSelector, withListener, stoppedByDefault) {
+        constructor(canvasSelector, withListener, stoppedByDefault, bg) {
             this.canvas = document.querySelector(canvasSelector);
             if (!this.canvas) throw new ApiError('canvas is not defined');
 
             this.ctx = this.canvas.getContext('2d');
             if (!this.ctx) throw new ApiError('it seems like element is not HTMLCanvasElement');
+
+            this.bg = bg;
 
             this.canvas.width = WIDTH * SIZE;
             this.canvas.height = HEIGHT * SIZE;
@@ -231,6 +233,20 @@
             const { matrix, _fillPixel, _piece, _pos: { x, y } } = this;
 
             this.ctx.clearRect(0, 0, WIDTH * SIZE, HEIGHT * SIZE);
+
+            if (this.bg) {
+                this.ctx.drawImage(
+                    this.bg,
+                    this.bg.width / 2 - WIDTH * SIZE / 2,
+                    this.bg.height / 2 - HEIGHT * SIZE / 2,
+                    WIDTH * SIZE,
+                    HEIGHT * SIZE,
+                    0,
+                    0,
+                    WIDTH * SIZE,
+                    HEIGHT * SIZE
+                );
+            }
 
             flatForEach(matrix, _fillPixel);
             flatForEach(_piece, (fill, pX, pY) => _fillPixel(fill, pX + x, pY + y));
