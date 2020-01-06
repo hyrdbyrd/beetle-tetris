@@ -33,5 +33,7 @@
 
     const notMaxThen = (cur, max) => cur > max ? max : cur;
 
+    const darkerHexColor = color => parseInt(color.slice(1), 16);
+
     window.HELPERS = { genArray, genMatrix, rand, logTable, rotate2DArray, flatForEach, genRandomColor, notMaxThen };
 })();

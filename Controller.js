@@ -176,10 +176,48 @@
 
         /** Хелперы */
         _fillPixel = (fill, x, y) => {
+            const { floor: f } = Math;
+
+            if (fill === EMPTY)
+                return;
+
             const { ctx } = this;
 
+            const X = x * SIZE;
+            const Y = y * SIZE;
+
+            const rotatingArgs = [1, 0, 360];
+
+            /* Тело букашки */
             ctx.fillStyle = COLORS[fill];
-            ctx.fillRect(x * SIZE, y * SIZE, SIZE, SIZE);
+            ctx.strokeStyle = '#000';
+
+            ctx.beginPath();
+            ctx.ellipse(f(X + SIZE / 2), f(Y + SIZE / 2), f(SIZE / 2.5), f(SIZE / 2.5), ...rotatingArgs);
+            ctx.fill();
+            ctx.stroke();
+
+            /** Глазочки букашечки */
+            const eyeSize = 5;
+
+            const drawEye = (x, y, pupilSize) => {
+                /** Глазочек */
+                ctx.fillStyle = '#fff';
+
+                ctx.beginPath();
+                ctx.ellipse(x, y, eyeSize, eyeSize, ...rotatingArgs);
+                ctx.fill();
+
+                /** Зрачок */
+                ctx.fillStyle = '#000';
+
+                ctx.beginPath();
+                ctx.ellipse(x, y, pupilSize, pupilSize, ...rotatingArgs);
+                ctx.fill();
+            };
+
+            drawEye(f(X + SIZE / 1.5), f(Y + SIZE / 2), 2.3);
+            drawEye(f(X + SIZE / 3.3), f(Y + SIZE / 2), 2);
         };
 
         _draw = () => {
@@ -287,8 +325,8 @@
         _gameOver = () => {
             console.log('%cGame Over', 'background: #333333; border: 1px solid #ffffff; color: #ffffff; padding: 5px;')
 
-            if (this._listeners.gameOver) this._listeners.gameOver();
             this._newGame();
+            if (this._listeners.gameOver) this._listeners.gameOver(this._score);
         };
 
         _save = () => {

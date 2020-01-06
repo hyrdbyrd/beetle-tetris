@@ -1,47 +1,46 @@
-const { Player, AI } = window;
+window.addEventListener('DOMContentLoaded', () => {
+    const { Player } = window;
 
-(() => {
-    try {
-        // Player
-        const player = document.querySelector('.player');
+    // Контейнер ВСЕГО
+    const player = document.querySelector('.player');
 
-        const scoreElement = player.querySelector('.score');
-        scoreElement.innerText = 'Score: 0';
+    // Для отображения счета
+    const scoreElement = player.querySelector('.score');
+    scoreElement.innerText = 'Score: 0';
 
-        const play = player.querySelector('.play');
-        const pause = player.querySelector('.pause');
+    // Контроллы
+    const pause = player.querySelector('.pause');
+    // Контролл-обложка
+    const play = player.querySelector('.play');
 
-        const paused = player.querySelector('.paused');
+    // Обложка для паузы
+    const paused = player.querySelector('.paused');
 
-        let playerController;
+    // Для получения размера контейнера
+    const playerController = new Player('#player', true);
 
-        // Для получения размера контейнера
-        playerController = new Player('#player', true);
+    const scoreCallback = score => scoreElement.innerText = `Score: ${score}`;
 
-        play.addEventListener('click', () => {
-            play.classList.add('hidden');
+    // Начало игры
+    play.addEventListener('click', () => {
+        play.classList.add('hidden');
 
-            playerController.start();
-            playerController
-                .on('score', score => {
-                    console.log('\n\n\n\n1\n\n\n', score);
-                    if (score) scoreElement.innerText = `Score: ${score}`;
-                });
-        });
+        playerController.start();
 
-        pause.addEventListener('click', () => {
-            playerController.stop();
-            paused.classList.remove('hidden');
-        });
+        playerController
+            .on('score', scoreCallback)
+            .on('gameOver', scoreCallback);
+    });
 
-        paused.addEventListener('click', () => {
-            playerController.start();
-            paused.classList.add('hidden');
-        });
+    // Кнопка паузы
+    pause.addEventListener('click', () => {
+        playerController.stop();
+        paused.classList.remove('hidden');
+    });
 
-        // AI
-        // new AI('#ai');
-    } catch (e) {
-        console.error(e);
-    }
-})();
+    // Продолжить игру
+    paused.addEventListener('click', () => {
+        playerController.start();
+        paused.classList.add('hidden');
+    });
+});
