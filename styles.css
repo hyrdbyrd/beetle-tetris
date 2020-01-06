@@ -45,6 +45,7 @@ body {
     padding: 10px;
 
     font-size: 36px;
+    text-transform: uppercase;
 
     display: flex;
     justify-content: center;

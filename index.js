@@ -1,7 +1,5 @@
 const { Player, AI } = window;
 
-
-
 (() => {
     // Player
     const player = document.querySelector('.player');
