@@ -4,17 +4,17 @@
     const { genMatrix, flatForEach, genRandomColor, rotate2DArray, notMaxThen } = HELPERS;
 
     window.Controller = class {
+        _isFalling = false;
+
         _score = 0;
         _listeners = {};
         _stopped = false;
         _pos = { x: 0, y: 0 };
-        _droppedTimer = undefined;
         _piece = [
             [0, 0, 0],
             [0, 0, 0],
             [0, 0, 0]
         ];
-
 
         /** Конструктор и его состовляющие */
         constructor(canvasSelector, withListener, stoppedByDefault, bg) {
@@ -71,9 +71,7 @@
                     // SPACE
                     case 32:
                         // Гарантия того, что мы упадем не за пределами view
-                        this._drop(true);
-                        this._drop(true);
-                        this._save();
+                        this._isFalling = true;
                         break;
                     // UP
                     case 38:
@@ -104,7 +102,7 @@
         }
 
         _move = (onMove, catchMove = () => undefined, xFunc = x => x, yFunc = y => y, piece = this._piece, matrix = this.matrix) => {
-            const { x, y } = this._pos;
+            const { x, y } = this;
 
             const canSet = !piece.some((row, pY) =>
                 row.some((fill, pX) => {
@@ -139,30 +137,39 @@
             this._loop();
         };
 
-        newGame = () => {
-            this._newGame();
-        };
+        newGame = this._newGame;
+
+        get x() {
+            return Math.round(this._pos.x);
+        }
+
+        get y() {
+            return Math.floor(this._pos.y);
+        }
+
+        get score() {
+            return this._score;
+        }
 
         /** Методы передвижений */
         _drop = (hardDrop) => {
-            const { floor } = Math;
+            const { _isFalling, score } = this;
 
-            const callback = () => {
-                clearTimeout(this._droppedTimer);
-                this._droppedTimer = undefined;
+            let dropСoefficient = (score / 1000 + 1) * 0.02;
 
-                this._move(() => this._pos.y++, this._save, undefined, y => y + 1);
-                if (this._listeners.drop) this._listeners.drop();
-            };
+            if (_isFalling)
+                dropСoefficient += 0.5;
 
-            if (hardDrop) callback();
-            else if (!this._droppedTimer)
-                this._droppedTimer = setTimeout(callback, DROP_THROTTLE - notMaxThen(floor(this._score / 50) * 100, DROP_THROTTLE / 1.15));
+            if (hardDrop)
+                dropСoefficient += 0.2;
+
+            this._move(() => this._pos.y += dropСoefficient, this._save, undefined, y => Math.ceil(y + dropСoefficient));
+
+            if (this._listeners.drop) this._listeners.drop();
         };
 
         _rotate = () => {
-            const { matrix } = this;
-            const { x, y } = this._pos;
+            const { matrix, x, y } = this;
             const piece = rotate2DArray(this._piece);
 
             const canSet = piece.every((row, pY) =>
@@ -252,8 +259,8 @@
             flatForEach(_piece, (fill, pX, pY) => _fillPixel(fill, pX + x, pY + y));
         };
 
-        _matrixWithPiece = (matrix = this.matrix, piece = this._piece, pos = this._pos) => {
-            const { x, y } = pos;
+        _matrixWithPiece = () => {
+            const { x, y, matrix, _piece: piece } = this;
             const newMatrix = matrix.map(e => [...e]);
 
             flatForEach(piece, (fill, pX, pY) => {
@@ -358,6 +365,9 @@
 
         _save = () => {
             const { x, y } = this._pos;
+
+            this._isFalling = false;
+
             if (this._piece.some((row, pY) => row.some((fill, pX) => fill !== EMPTY && x + pX < 0 || y + pY < 0)))
                 this._gameOver();
 
